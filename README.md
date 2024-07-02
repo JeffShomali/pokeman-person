@@ -53,15 +53,16 @@ We are creating an innovative application where users can explore and discover s
 
 ![Map After Few Minutes](./assets/2.png)
 
-### Screen 3: Event Details
+### Screen 3: House/Event Details
 
 ![Event Details](./assets/3.png)
 
 #### Requirements:
 
 1. **Event Information**:
-    - Display detailed event information when an event marker is tapped.
+    - Display detailed event/house information when an event marker is tapped.
     - Include event name, date, time, remaining time, and the number of attendees.
+    - Display up to 6 users avatar attending attending to that house.
 2. **Shadow and Attendance**:
     - Event markers should dynamically update shadow size based on the number of attendees.
     - Ensure the "Users Count Presented" parameter updates as users move closer to the event.

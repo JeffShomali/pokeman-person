@@ -8,8 +8,9 @@ We are creating an innovative application where users can explore and discover s
 
 1. **Map Component**:
 
-    - We will use styled Google Map or MapBox maps to display our target houses.
+    - We will use styled MapBox maps to display our target houses.
     - The map component will have two main elements: users and house (represented as Pokemon Go houses).
+    
 
 2. **Users**:
 
@@ -20,9 +21,9 @@ We are creating an innovative application where users can explore and discover s
 
 3. **Events (Pokemon Go Houses)**:
 
-    - Events are static elements on the map, represented as houses with number of Pokemon.
+    - Events are static elements on the map, represented as houses with number of Users.
     - Each event has a unique randomized color representing different Pokemon types.
-    - Event shadow size correlates with the event's current attendance (number of Pokemon found). The largest event on the screen has the biggest shadow, with other events proportionally smaller.
+    - Event shadow size correlates with the event's current pokemon hunters. The largest event on the screen has the biggest shadow, with other events proportionally smaller.
     - The "Users Count Presented" parameter includes all users (Pokemon hunters) in the vicinity of the event. Users close to an event will be removed from the map, and the event number will update with an animation.
 
 4. **Shadow and Border Styles**:

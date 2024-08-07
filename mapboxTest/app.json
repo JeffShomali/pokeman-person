@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "mapboxTest",
+    "slug": "mapboxTest",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsVersion": "11.0.0",
+          "RNMapboxMapsDownloadToken": "sk.eyJ1IjoiYXJpaml0cmVhY3RuYXRpdmUyMCIsImEiOiJjbHppaHRoaW8wZXA2MmtzaXd5dzZjMHNwIn0.qYsO4LT2TArAHS15foIokg"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Show current location on map."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

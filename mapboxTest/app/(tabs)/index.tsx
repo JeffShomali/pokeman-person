@@ -1,60 +1,70 @@
-import { Image, StyleSheet, Platform, View } from "react-native";
+import { Image, StyleSheet, Platform, View, Text } from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import Mapbox from "@rnmapbox/maps";
+import MapboxGL from "@rnmapbox/maps";
+import Events from "../../data/event_house.json";
+import CustomPointAnnotation from "@/components/CustomPointAnnotation";
 
-Mapbox.setAccessToken(
+MapboxGL.setAccessToken(
   "pk.eyJ1IjoiYXJpaml0cmVhY3RuYXRpdmUyMCIsImEiOiJjbHZ6aDUwbGQzMGxyMmlvNmloeTM4ZGhjIn0.R-fCkR4YLW7HaCRn0gopEQ"
 );
 
+const event = {
+  title: "ODESZA The Final Go...",
+  date: "Saturday, Aug 18, 2024 at 3:00 PM",
+  duration: "4h 15m",
+  startsIn: "Starts in 6h",
+  friendsGoing: 3,
+  othersGoing: 154,
+  imageUrl:
+    "https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8aG91c2V8ZW58MHx8MHx8fDA%3D",
+};
+
 export default function HomeScreen() {
   return (
-    // <ParallaxScrollView
-    //   headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-    //   headerImage={
-    //     <Image
-    //       source={require('@/assets/images/partial-react-logo.png')}
-    //       style={styles.reactLogo}
-    //     />
-    //   }>
-    //   <ThemedView style={styles.titleContainer}>
-    //     <ThemedText type="title">Welcome!</ThemedText>
-    //     <HelloWave />
-    //   </ThemedView>
-    //   <ThemedView style={styles.stepContainer}>
-    //     <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-    //     <ThemedText>
-    //       Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-    //       Press{' '}
-    //       <ThemedText type="defaultSemiBold">
-    //         {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-    //       </ThemedText>{' '}
-    //       to open developer tools.
-    //     </ThemedText>
-    //   </ThemedView>
-    //   <ThemedView style={styles.stepContainer}>
-    //     <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-    //     <ThemedText>
-    //       Tap the Explore tab to learn more about what's included in this starter app.
-    //     </ThemedText>
-    //   </ThemedView>
-    //   <ThemedView style={styles.stepContainer}>
-    //     <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-    //     <ThemedText>
-    //       When you're ready, run{' '}
-    //       <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-    //       <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-    //       <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-    //       <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-    //     </ThemedText>
-    //   </ThemedView>
-    // </ParallaxScrollView>
     <View style={styles.page}>
       <View style={styles.container}>
-        <Mapbox.MapView style={styles.map} />
+        <MapboxGL.MapView
+          style={styles.map}
+          logoEnabled={false}
+          attributionEnabled={false}
+          scaleBarEnabled={false}
+          styleURL="mapbox://styles/mapbox/dark-v11"
+        >
+          <MapboxGL.Camera
+            zoomLevel={14}
+            centerCoordinate={[-122.0652, 37.9055]}
+          />
+          {Events.map((item, index) => {
+            return (
+              <CustomPointAnnotation
+                id={item.id.toString()}
+                coordinate={[item.location.longitude, item.location.latitude]}
+                title="Example"
+                count={item.pokemon_present}
+                imageUrl={item.image}
+                eventColor={item.shadow_color}
+                totalCount={item.pokemon_will_attend}
+              />
+            );
+          })}
+        </MapboxGL.MapView>
+      </View>
+      <View style={styles.eventInfo}>
+        <Image source={{ uri: event.imageUrl }} style={styles.eventImage} />
+        <View style={styles.eventTextContainer}>
+          <Text style={styles.eventTitle}>{event.title}</Text>
+          <Text style={styles.eventDate}>{event.date}</Text>
+          <Text>{event.duration}</Text>
+          <Text>{event.startsIn}</Text>
+          <Text>
+            {event.friendsGoing} of your friends and {event.othersGoing} others
+            are going
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -83,10 +93,56 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   container: {
-    height: 300,
-    width: 300,
+    flex: 1,
+    width: "100%",
   },
   map: {
     flex: 1,
+  },
+  annotationContainer: {
+    width: 30,
+    height: 30,
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#007AFF",
+    shadowOffset: { width: 8, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+  },
+  annotationFill: {
+    width: 15,
+    height: 15,
+    backgroundColor: "#007AFF",
+    borderRadius: 7.5,
+  },
+  eventInfo: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#000",
+    padding: 20,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  eventImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 10,
+  },
+  eventTextContainer: {
+    flex: 1,
+  },
+  eventTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  eventDate: {
+    color: "#fff",
   },
 });

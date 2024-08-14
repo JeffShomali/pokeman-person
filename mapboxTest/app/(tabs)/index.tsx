@@ -4,9 +4,13 @@ import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import MapboxGL from "@rnmapbox/maps";
+import MapboxGL, { CircleLayerStyle } from "@rnmapbox/maps";
 import Events from "../../data/event_house.json";
 import CustomPointAnnotation from "@/components/CustomPointAnnotation";
+import { useEffect, useState } from "react";
+import Users from "../../data/users.json";
+import { getRandomLatLon } from "@/constants/GetRandomLocation";
+import CustomUserMarker from "@/components/CustomUserMarker";
 
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiYXJpaml0cmVhY3RuYXRpdmUyMCIsImEiOiJjbHZ6aDUwbGQzMGxyMmlvNmloeTM4ZGhjIn0.R-fCkR4YLW7HaCRn0gopEQ"
@@ -24,6 +28,13 @@ const event = {
 };
 
 export default function HomeScreen() {
+  const [eventDetails, setEventDetails] = useState({});
+  const [sortEvents, setSortEvents] = useState([]);
+  useEffect(() => {
+    const eve = [...Events];
+    eve.sort((a, b) => b.pokemon_present - a.pokemon_present);
+    setSortEvents(eve);
+  }, []);
   return (
     <View style={styles.page}>
       <View style={styles.container}>
@@ -33,12 +44,24 @@ export default function HomeScreen() {
           attributionEnabled={false}
           scaleBarEnabled={false}
           styleURL="mapbox://styles/mapbox/dark-v11"
+          onPress={(e) => {
+            setEventDetails({}), console.log(e);
+          }}
         >
           <MapboxGL.Camera
             zoomLevel={14}
             centerCoordinate={[-122.0652, 37.9055]}
           />
-          {Events.map((item, index) => {
+          {Users.map((item) => {
+            const location = getRandomLatLon(37.9055, -122.0652, 1000);
+            return (
+              <CustomUserMarker
+                user={item}
+                location={[location.longitude, location.latitude]}
+              />
+            );
+          })}
+          {sortEvents.map((item, index) => {
             return (
               <CustomPointAnnotation
                 id={item.id.toString()}
@@ -47,13 +70,16 @@ export default function HomeScreen() {
                 count={item.pokemon_present}
                 imageUrl={item.image}
                 eventColor={item.shadow_color}
-                totalCount={item.pokemon_will_attend}
+                totalCount={sortEvents[0].pokemon_present}
+                onPressMarker={() => {
+                  setEventDetails(item);
+                }}
               />
             );
           })}
         </MapboxGL.MapView>
       </View>
-      <View style={styles.eventInfo}>
+      {/* <View style={styles.eventInfo}>
         <Image source={{ uri: event.imageUrl }} style={styles.eventImage} />
         <View style={styles.eventTextContainer}>
           <Text style={styles.eventTitle}>{event.title}</Text>
@@ -65,7 +91,7 @@ export default function HomeScreen() {
             are going
           </Text>
         </View>
-      </View>
+      </View> */}
     </View>
   );
 }

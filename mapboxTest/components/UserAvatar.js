@@ -3,7 +3,7 @@ import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 
 import colorSys from "../config/colorSys";
 
-const DEFAULT_AVATAR = require("../assets/images/avatar-dark.png");
+// const DEFAULT_AVATAR = require("../assets/images/avatar-dark.png");
 
 const UserAvatar = ({
   image,
@@ -14,9 +14,10 @@ const UserAvatar = ({
 }) => {
   const uri = useMemo(() => {
     const uniqueTimestamp = new Date().getTime();
-    const updatedImage =
-      image?.replace("/original/", `/${quality}/`).replace("dev.", "") +
-      `?timestamp=${uniqueTimestamp}`;
+    // const updatedImage =
+    //   image?.replace("/original/", `/${quality}/`).replace("dev.", "") +
+    //   `?timestamp=${uniqueTimestamp}`;
+    const updatedImage = image;
 
     return updatedImage;
   }, [image, quality]);

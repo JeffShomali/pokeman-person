@@ -26,6 +26,10 @@ node_modules/
 dist/
 web-build/
 
+# Ignore the 'android and ios' folder
+ android/
+ ios/
+
 # Native
 *.orig.*
 *.jks

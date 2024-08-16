@@ -1,6 +1,7 @@
 import { Image, StyleSheet, Text, View } from "react-native";
 import React, { useRef } from "react";
 import MapboxGL from "@rnmapbox/maps";
+import UserAvatar from "./UserAvatar";
 MapboxGL.Logger.setLogCallback((log) => {
   // remove Source RNMBX-mapview-point-annotations_drag
   if (
@@ -20,11 +21,14 @@ const CustomUserMarker = ({ user, location }) => {
       key={user.id}
       id={`user-${user.id}`}
       coordinate={location}
+      onSelected={() => {}}
     >
-      <View style={styles.markerContainer}>
-        <Image source={{ uri: user.image }} style={styles.userLocationIcon} />
-        <Text style={styles.userNameText}>{user.name}</Text>
-      </View>
+      <UserAvatar
+        image={user.image}
+        hasShadow={true}
+        onLoadImage={() => markerRef?.current?.refresh()}
+        key={user.id}
+      />
     </MapboxGL.PointAnnotation>
   );
 };

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import Users from "../../data/users.json";
 import { getRandomLatLon } from "@/constants/GetRandomLocation";
 import CustomUserMarker from "@/components/CustomUserMarker";
+import EventWithUserCircle from "@/components/EventWithUserCircle";
 
 MapboxGL.setAccessToken(
   "pk.eyJ1IjoiYXJpaml0cmVhY3RuYXRpdmUyMCIsImEiOiJjbHZ6aDUwbGQzMGxyMmlvNmloeTM4ZGhjIn0.R-fCkR4YLW7HaCRn0gopEQ"
@@ -52,7 +53,7 @@ export default function HomeScreen() {
             zoomLevel={14}
             centerCoordinate={[-122.0652, 37.9055]}
           />
-          {Users.map((item) => {
+          {/* {Users.map((item) => {
             const location = getRandomLatLon(37.9055, -122.0652, 1000);
             return (
               <CustomUserMarker
@@ -60,23 +61,27 @@ export default function HomeScreen() {
                 location={[location.longitude, location.latitude]}
               />
             );
-          })}
-          {sortEvents.map((item, index) => {
+          })} */}
+          <EventWithUserCircle id={"1"} coordinate={[-122.0652, 37.9055]} />
+          {/* {sortEvents.map((item, index) => {
             return (
               <CustomPointAnnotation
-                id={item.id.toString()}
-                coordinate={[item.location.longitude, item.location.latitude]}
+                id={item?.id?.toString()}
+                coordinate={[
+                  item?.location?.longitude,
+                  item?.location?.latitude,
+                ]}
                 title="Example"
-                count={item.pokemon_present}
-                imageUrl={item.image}
-                eventColor={item.shadow_color}
-                totalCount={sortEvents[0].pokemon_present}
+                count={item?.pokemon_present}
+                imageUrl={item?.image}
+                eventColor={item?.shadow_color}
+                totalCount={sortEvents[0]?.pokemon_present}
                 onPressMarker={() => {
                   setEventDetails(item);
                 }}
               />
             );
-          })}
+          })} */}
         </MapboxGL.MapView>
       </View>
       {/* <View style={styles.eventInfo}>

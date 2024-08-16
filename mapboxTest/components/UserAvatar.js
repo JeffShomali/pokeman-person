@@ -11,6 +11,7 @@ const UserAvatar = ({
   quality = "small",
   hasShadow = true,
   verified = false,
+  onLoadImage,
 }) => {
   const uri = useMemo(() => {
     const uniqueTimestamp = new Date().getTime();
@@ -67,6 +68,7 @@ const UserAvatar = ({
             },
           ]}
           resizeMode="cover"
+          onLoad={() => onLoadImage()}
           onError={handleImageError} // Set onError handler
         />
       </View>

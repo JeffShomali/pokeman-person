@@ -1,5 +1,12 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, Pressable } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Pressable,
+  Animated,
+} from "react-native";
 import MapboxGL from "@rnmapbox/maps";
 const images = [
   "https://randomuser.me/api/portraits/women/16.jpg",
@@ -13,32 +20,66 @@ const images = [
 const radius = 50;
 const centerImageSize = 80;
 
-const EventWithUserCircle = ({ id, coordinate }) => {
+const EventWithUserCircle = ({
+  id,
+  coordinate,
+  imageUrl,
+  eventColor,
+  count,
+}) => {
+  const [expanded, setExpanded] = useState(false);
+  const animations = useRef(images.map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    handlePress();
+  }, []);
+
+  const handlePress = () => {
+    setExpanded(!expanded);
+    Animated.stagger(
+      100,
+      animations.map((anim) =>
+        Animated.spring(anim, {
+          toValue: expanded ? 0 : 1,
+          useNativeDriver: false,
+        })
+      )
+    ).start();
+  };
   return (
     <MapboxGL.MarkerView id={id} coordinate={coordinate}>
       <View style={styles.container}>
         {images.map((uri, index) => {
           const angle = (index / (images.length - 1)) * Math.PI - Math.PI / 1;
-          const x = radius * Math.cos(angle);
-          const y = radius * Math.sin(angle);
+          const x = animations[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, radius * Math.cos(angle)],
+          });
+          const y = animations[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, radius * Math.sin(angle)],
+          });
           return (
-            <Image
+            <Animated.Image
               key={index}
               source={{ uri }}
-              style={[styles.profileImage, { left: x, top: y }]}
+              style={[
+                styles.profileImage,
+                { transform: [{ translateX: x }, { translateY: y }] },
+              ]}
             />
           );
         })}
         <View style={styles.centerContainer}>
           <Image
             source={{
-              uri: "https://images.unsplash.com/photo-1504615755583-2916b52192a3?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8aG91c2V8ZW58MHx8MHx8fDA%3D",
+              uri: imageUrl,
             }}
-            style={styles.centerImage}
+            style={[styles.centerImage, { borderColor: eventColor }]}
           />
-          <Text style={styles.centerText}>1.1k</Text>
+          <Text style={styles.centerText}>{count}</Text>
         </View>
-        <Text style={styles.countText}>+2k</Text>
+        <Text style={styles.countText}></Text>
       </View>
     </MapboxGL.MarkerView>
   );

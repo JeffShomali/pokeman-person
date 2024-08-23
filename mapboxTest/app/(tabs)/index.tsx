@@ -27,23 +27,40 @@ export default function HomeScreen() {
   const [eventDetails, setEventDetails] = useState({});
   const [sortEvents, setSortEvents] = useState([]);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(10);
   const [heatMapData, setHeatMapData] = useState({});
+  const [eventMapData, setEventMapData] = useState({});
   useEffect(() => {
     const eve = [...Events];
     eve.sort((a, b) => b.pokemon_present - a.pokemon_present);
     setSortEvents(eve);
+
+    let evefeatures: any = [];
+    eve.map((data) => {
+      const obj = {
+        type: "Feature",
+        properties: { ...data, mag: 4 },
+        geometry: {
+          type: "Point",
+          coordinates: [data.location.longitude, data.location.latitude],
+        },
+      };
+
+      evefeatures.push(obj);
+    });
+    setEventMapData({
+      type: "FeatureCollection",
+      features: evefeatures,
+    });
+
     if (Users.length > 0) {
-      let features = [];
+      let features: any = [];
       Users.map((data) => {
         const obj = {
           type: "Feature",
+          properties: { ...data, mag: 4 },
           geometry: {
             type: "Point",
             coordinates: [data.location.longitude, data.location.latitude],
-          },
-          properties: {
-            title: data.name,
           },
         };
 
@@ -54,72 +71,10 @@ export default function HomeScreen() {
         features: features,
       });
     }
-    Image.getSize(
-      "https://randomuser.me/api/portraits/men/45.jpg",
-      (width, height) => {
-        MapboxGL.images = {
-          userIcon: { uri: "https://randomuser.me/api/portraits/men/45.jpg" },
-        };
-        setImageLoaded(true); // Ensure the image is loaded before rendering the layer
-      }
-    );
   }, []);
 
   const isEmpty = (obj) => {
     return Object.keys(obj).length === 0;
-  };
-
-  const heatmapLayer = {
-    id: "heatmap",
-    sourceID: "heatmapSource",
-    type: "heatmap",
-    paint: {
-      // Customize the heatmap intensity
-      "heatmap-intensity": {
-        stops: [
-          [0, 1],
-          [10, 3],
-        ],
-      },
-      // Customize the heatmap color gradient
-      "heatmap-color": [
-        "interpolate",
-        ["linear"],
-        ["heatmap-density"],
-        0,
-        "rgba(33,102,172,0)",
-        0.2,
-        "rgb(103,169,207)",
-        0.4,
-        "rgb(209,229,240)",
-        0.6,
-        "rgb(253,219,199)",
-        0.8,
-        "rgb(239,138,98)",
-        1,
-        "rgb(178,24,43)",
-      ],
-      // Customize the heatmap radius
-      "heatmap-radius": {
-        stops: [
-          [0, 2],
-          [10, 20],
-        ],
-      },
-      // Set the heatmap opacity
-      "heatmap-opacity": 0.3,
-    },
-  };
-
-  const pointLayer = {
-    id: "pointLayer",
-    sourceID: "heatmapSource",
-    type: "symbol",
-    layout: {
-      "icon-image": "userIcon", // Replace with your custom image if needed
-      "icon-size": 1,
-      "icon-allow-overlap": true,
-    },
   };
 
   return (
@@ -134,34 +89,158 @@ export default function HomeScreen() {
           onPress={(e) => {
             setEventDetails({});
           }}
-          onRegionDidChange={(region) =>
-            setZoomLevel(region.properties.zoomLevel)
-          }
         >
           <MapboxGL.Camera
-            zoomLevel={zoomLevel}
-            centerCoordinate={[-122.0652, 37.9055]}
+            zoomLevel={12}
+            centerCoordinate={[-122.0647, 37.8951]}
           />
-          <MapboxGL.ShapeSource id="heatmapSource" shape={heatMapData}>
-            {/* {zoomLevel <= 10 ? ( */}
-            <MapboxGL.HeatmapLayer {...heatmapLayer} />
-            {/* ) : (
-              <>{imageLoaded && <MapboxGL.SymbolLayer {...pointLayer} />}</>
-            )} */}
+          <MapboxGL.ShapeSource id="usersData" shape={heatMapData}>
+            <MapboxGL.HeatmapLayer
+              id="usersData-heat"
+              maxZoomLevel={14}
+              style={{
+                heatmapWeight: [
+                  "interpolate",
+                  ["linear"],
+                  ["get", "mag"],
+                  0,
+                  0,
+                  6,
+                  1,
+                ],
+                heatmapIntensity: [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  0,
+                  1,
+                  14,
+                  3,
+                ],
+                heatmapColor: [
+                  "interpolate",
+                  ["linear"],
+                  ["heatmap-density"],
+                  0,
+                  "rgba(33,102,172,0)",
+                  0.2,
+                  "rgb(103,169,207)",
+                  0.4,
+                  "rgb(209,229,240)",
+                  0.6,
+                  "rgb(253,219,199)",
+                  0.8,
+                  "rgb(239,138,98)",
+                  1,
+                  "rgb(178,24,43)",
+                ],
+                heatmapRadius: [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  0,
+                  2,
+                  14,
+                  20,
+                ],
+                heatmapOpacity: [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  7,
+                  1,
+                  14,
+                  1,
+                ],
+              }}
+            />
+            <MapboxGL.CircleLayer
+              id="usersData-point"
+              minZoomLevel={14}
+              style={{
+                circleRadius: [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  14,
+                  10, // Increase circle size
+                  16,
+                  20, // Larger circle size at higher zoom
+                ],
+                circleColor: [
+                  "interpolate",
+                  ["linear"],
+                  ["get", "mag"],
+                  1,
+                  "rgba(33,102,172,0)",
+                  2,
+                  "rgb(103,169,207)",
+                  3,
+                  "rgb(209,229,240)",
+                  4,
+                  "rgb(253,219,199)",
+                  5,
+                  "rgb(239,138,98)",
+                  6,
+                  "rgb(178,24,43)",
+                ],
+                circleStrokeColor: "white",
+                circleStrokeWidth: 4, // Increase stroke width for emphasis
+                circleOpacity: [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  14,
+                  0,
+                  15,
+                  1,
+                ],
+              }}
+            />
           </MapboxGL.ShapeSource>
+          {/* <MapboxGL.ShapeSource
+            id="eventData"
+            shape={eventMapData}
+            cluster
+            clusterRadius={50}
+            clusterMaxZoom={14}
+          >
+            <> */}
+          {sortEvents.map((item, index) => {
+            return (
+              <CustomPointAnnotation
+                id={item?.id?.toString()}
+                coordinate={[
+                  item?.location?.longitude,
+                  item?.location?.latitude,
+                ]}
+                title="Example"
+                count={item?.pokemon_present}
+                imageUrl={item?.image}
+                eventColor={item?.shadow_color}
+                totalCount={sortEvents[0]?.pokemon_present}
+                onPressMarker={() => {
+                  setEventDetails(item);
+                }}
+              />
+            );
+          })}
+          {/* </>
+          </MapboxGL.ShapeSource> */}
+
           {/* {isEmpty(eventDetails) && (
             <>
               {Users.map((item) => {
                 return (
                   <CustomUserMarker
                     user={item}
-                    location={[location.longitude, location.latitude]}
+                    location={[item.location.longitude, item.location.latitude]}
                   />
                 );
               })}
             </>
-          )}
-          {!isEmpty(eventDetails) && (
+          )} */}
+          {/*{!isEmpty(eventDetails) && (
             <EventWithUserCircle
               id={"1"}
               coordinate={[
@@ -172,8 +251,8 @@ export default function HomeScreen() {
               eventColor={eventDetails?.shadow_color}
               count={eventDetails?.pokemon_present}
             />
-          )}
-          {isEmpty(eventDetails) && (
+          )}*/}
+          {/* {isEmpty(eventDetails) && (
             <>
               {sortEvents.map((item, index) => {
                 return (

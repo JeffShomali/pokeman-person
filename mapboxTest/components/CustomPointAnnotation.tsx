@@ -31,6 +31,9 @@ const CustomPointAnnotation = ({
         elevation: elevation,
         shadowRadius: shadowRadius < 5 ? 5 : shadowRadius,
       }}
+      anchor={{ x: 0.5, y: 0.5 }}
+      // allowOverlap={true}
+      collapsable={true}
     >
       <Pressable style={styles.annotationContainer} onPress={onPressMarker}>
         <View style={[styles.bubble, { borderColor: eventColor }]}>
